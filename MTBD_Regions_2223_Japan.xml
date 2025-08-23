@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='Standard' beautistatus='' namespace="beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.base.evolution.alignment:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.tree.coalescent:beast.pkgmgmt:beast.base.core:beast.base.inference.util:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="BEAST.base v2.7.7:BDMM-Prime v2.2.2:SA v2.1.1:ORC v1.2.0:BEASTLabs v2.0.2" version="2.7">
+
+ <!-- Alignment -->
+    <data
+id="modified_MTBD_2223_7"
+spec="feast.fileio.AlignmentFromFasta"
+fileName = "modified_MTBD_2223_7.fasta"
+name="alignment"/>
+
+<!-- Map elements -->
+    <map name="Uniform" >beast.base.inference.distribution.Uniform</map>
+    <map name="Exponential" >beast.base.inference.distribution.Exponential</map>
+    <map name="LogNormal" >beast.base.inference.distribution.LogNormalDistributionModel</map>
+    <map name="Normal" >beast.base.inference.distribution.Normal</map>
+    <map name="Beta" >beast.base.inference.distribution.Beta</map>
+    <map name="Gamma" >beast.base.inference.distribution.Gamma</map>
+    <map name="LaplaceDistribution" >beast.base.inference.distribution.LaplaceDistribution</map>
+    <map name="prior" >beast.base.inference.distribution.Prior</map>
+    <map name="InverseGamma" >beast.base.inference.distribution.InverseGamma</map>
+    <map name="OneOnX" >beast.base.inference.distribution.OneOnX</map>
+
+<!-- MCMC -->
+    <run id="mcmc" spec="MCMC" chainLength="100000000">
+
+        <!-- State -->
+        <state id="state" spec="State" storeEvery="10000">
+            <tree id="Tree.t:modified_MTBD_2223_7" spec="beast.base.evolution.tree.Tree" name="stateNode">
+                <trait id="dateTrait.t:modified_MTBD_2223_7" spec="feast.fileio.TraitSetFromTaxonSet" 
+                    dateFormat="yyyy-M-dd" 
+                    traitname="date" 
+                    delimiter= "/"
+                    takeGroup="5"> 
+                    <taxa id="TaxonSet.modified_MTBD_2223_7" spec="TaxonSet">
+                        <alignment idref="modified_MTBD_2223_7"/>
+                    </taxa>
+                </trait>
+                <taxonset idref="TaxonSet.modified_MTBD_2223_7"/>
+            </tree>
+            <parameter id="kappa.s:modified_MTBD_2223_7" spec="parameter.RealParameter" lower="0.0" name="stateNode">2.0</parameter>
+            <parameter id="freqParameter.s:modified_MTBD_2223_7" spec="parameter.RealParameter" dimension="4" lower="0.0" name="stateNode" upper="1.0">0.25</parameter>
+            <parameter id="gammaShape.s:modified_MTBD_2223_7" spec="parameter.RealParameter" lower="0.1" name="stateNode">1.0</parameter>
+            <parameter id="ORCucldMean.c:modified_MTBD_2223_7" spec="parameter.RealParameter" name="stateNode">0.001</parameter>
+            <parameter id="ORCsigma.c:modified_MTBD_2223_7" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.2</parameter>
+            <parameter id="ORCRates.c:modified_MTBD_2223_7" spec="parameter.RealParameter" dimension="912" lower="1.0E-100" name="stateNode">0.5</parameter>
+            <parameter id="originBDMMPrime.t:modified_MTBD_2223_7" spec="parameter.RealParameter" name="stateNode">5.0</parameter>
+            <parameter id="ReEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" lower="0.0" name="stateNode">1.0</parameter>
+            <parameter id="becomeUninfectiousRateEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" lower="0.0" name="stateNode">52.0</parameter>
+            <parameter id="samplingProportionEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" dimension="8" lower="0.0" name="stateNode" upper="1.0">0.2 0.1 0.01 0.3 0.0 0.0 0.0 0.0</parameter>
+            <parameter id="migrationRateEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" dimension="12" lower="0.0" name="stateNode">1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</parameter>
+            </state>
+        
+        <!-- Tree initialiser --> 
+        <init id="RandomTree.t:modified_MTBD_2223_7" spec="RandomTree" estimate="false" initial="@Tree.t:modified_MTBD_2223_7" taxa="@modified_MTBD_2223_7">
+            <populationModel id="ConstantPopulation0.t:modified_MTBD_2223_7" spec="ConstantPopulation">
+                <parameter id="randomPopSize.t:modified_MTBD_2223_7" spec="parameter.RealParameter" name="popSize">1.0</parameter>
+            </populationModel>
+        </init>
+        
+        <!-- Posterior Distribution -->
+        <distribution id="posterior" spec="CompoundDistribution">
+
+            <!-- Prior Distribution -->
+            <distribution id="prior" spec="CompoundDistribution">
+
+                <!-- BDMM-Prime distribution --> 
+                <distribution id="BDMMPrime.t:modified_MTBD_2223_7" spec="bdmmprime.distribution.BirthDeathMigrationDistribution" conditionOnSurvival="false" tree="@Tree.t:modified_MTBD_2223_7">
+                    
+                    <!-- Parameterization BDMM-Prime -->
+                    <parameterization id="EpiBDMMPrimeParameterization.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.EpiParameterization" processLength="@originBDMMPrime.t:modified_MTBD_2223_7">
+                        <Re id="ReSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineVectorParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" skylineValues="@ReEpi.t:modified_MTBD_2223_7" timesAreAges="true">
+                            <typeSet id="typeSetBDMMPrime.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.TypeSet">
+                                <typeTraitSet id="typeTraitSet.t:modified_MTBD_2223_7" spec="feast.fileio.TraitSetFromTaxonSet" traitname="type" delimiter="/" takeGroup="3">    
+                                    <taxa id="TaxonSet.1" spec="TaxonSet" alignment="@modified_MTBD_2223_7"/>
+                                </typeTraitSet>
+                            </typeSet>
+                        </Re>
+
+                        <becomeUninfectiousRate id="becomeUninfectiousRateSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineVectorParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" skylineValues="@becomeUninfectiousRateEpi.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7"/>
+                        
+                        <samplingProportion id="samplingProportionSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineVectorParameter" isScalar="false" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" skylineValues="@samplingProportionEpi.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7">
+                            <parameter id="samplingProportionChangeTimesEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" estimate="false" lower="0.0" name="changeTimes">1</parameter>
+                        </samplingProportion>
+
+                        <rhoSampling id="rhoSamplingProbSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.TimedParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7"/>
+
+                        <removalProb id="removalProbSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineVectorParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7">
+                            <parameter id="removalProbEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" estimate="false" lower="0.0" name="skylineValues" upper="1.0">1.0</parameter>
+                        </removalProb>
+
+                        <migrationRate id="migrationRateSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineMatrixParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" skylineValues="@migrationRateEpi.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7"/>
+
+                        <ReAmongDemes id="ReAmongDemesSPEpi.t:modified_MTBD_2223_7" spec="bdmmprime.parameterization.SkylineMatrixParameter" processLength="@originBDMMPrime.t:modified_MTBD_2223_7" timesAreAges="true" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7">
+                            <parameter id="ReAmongDemesEpi.t:modified_MTBD_2223_7" spec="parameter.RealParameter" estimate="false" lower="0.0" name="skylineValues">0.0</parameter>
+                        </ReAmongDemes>
+
+                        <typeSet idref="typeSetBDMMPrime.t:modified_MTBD_2223_7"/>
+                    
+                    </parameterization>
+
+                    <parameter id="startTypePriorProbs.t:modified_MTBD_2223_7" spec="parameter.RealParameter" dimension="4" estimate="false" lower="0.0" name="startTypePriorProbs" upper="1.0">0.25 0.25 0.25 0.25</parameter>
+
+                    <typeTraitSet idref="typeTraitSet.t:modified_MTBD_2223_7"/>
+
+                </distribution>
+
+                <!-- Priors on parameters -->
+                <prior id="ORCRatePriorDistribution.c:modified_MTBD_2223_7" name="distribution" x="@ORCRates.c:modified_MTBD_2223_7">
+                    <LogNormal id="LogNormalDistributionModel.1" S="@ORCsigma.c:modified_MTBD_2223_7" meanInRealSpace="true" name="distr">
+                        <parameter id="RealParameter.1" spec="parameter.RealParameter" estimate="false" name="M">1.0</parameter>
+                    </LogNormal>
+                </prior>
+
+                <prior id="ORCsigmaPrior.c:modified_MTBD_2223_7" name="distribution" x="@ORCsigma.c:modified_MTBD_2223_7">
+                    <Gamma id="Gamma.0" name="distr">
+                        <parameter id="RealParameter.2" spec="parameter.RealParameter" estimate="false" name="alpha">5.0</parameter>
+                        <parameter id="RealParameter.3" spec="parameter.RealParameter" estimate="false" name="beta">0.05</parameter>
+                    </Gamma>
+                </prior>
+
+                <prior id="ORCucldMeanPrior.c:modified_MTBD_2223_7" name="distribution" x="@ORCucldMean.c:modified_MTBD_2223_7">
+                    <Gamma id="Gamma.1" name="distr">
+                        <alpha id="Function$Constant.0" spec="Function$Constant" value="0.1"/>
+                        <beta id="Function$Constant.1" spec="Function$Constant" value="100.0"/>
+                    </Gamma>
+                </prior>
+
+                <!--<distribution id="ReEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@ReEpi.t:modified_MTBD_2223_7">
+                    <OneOnX id="OneOnX.30" name="distr"/>
+                </distribution>-->
+
+                <distribution id="ReEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@ReEpi.t:modified_MTBD_2223_7">
+                    <LogNormal id="LogNormalDistributionModel.3" name="distr">
+                        <parameter id="RealParameter.4" spec="parameter.RealParameter" estimate="false" name="M">0.0</parameter>
+                        <parameter id="RealParameter.5" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="5.0">1</parameter>
+                    </LogNormal>
+                </distribution>
+
+                <prior id="FrequenciesPrior.s:modified_MTBD_2223_7" name="distribution" x="@freqParameter.s:modified_MTBD_2223_7">
+                    <distr id="Dirichlet.0" spec="distribution.Dirichlet">
+                        <parameter id="RealParameter.6" spec="parameter.RealParameter" dimension="4" estimate="false" name="alpha">4.0 4.0 4.0 4.0</parameter>
+                    </distr>
+                </prior>
+
+                <prior id="GammaShapePrior.s:modified_MTBD_2223_7" name="distribution" x="@gammaShape.s:modified_MTBD_2223_7">
+                    <Exponential id="Exponential.0" name="distr">
+                        <parameter id="RealParameter.7" spec="parameter.RealParameter" estimate="false" name="mean">1.0</parameter>
+                    </Exponential>
+                </prior>
+
+                <prior id="KappaPrior.s:modified_MTBD_2223_7" name="distribution" x="@kappa.s:modified_MTBD_2223_7">
+                    <LogNormal id="LogNormalDistributionModel.0" name="distr">
+                        <parameter id="RealParameter.8" spec="parameter.RealParameter" estimate="false" name="M">1.0</parameter>
+                        <parameter id="RealParameter.9" spec="parameter.RealParameter" estimate="false" name="S">1.25</parameter>
+                    </LogNormal>
+                </prior>
+
+                <!-- distribution id="becomeUninfectiousRateEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@becomeUninfectiousRateEpi.t:modified_MTBD_2223_7">
+                    <OneOnX id="OneOnX.34" name="distr"/>
+                </distribution> -->
+
+                <distribution id="becomeUninfectiousRateEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@becomeUninfectiousRateEpi.t:modified_MTBD_2223_7">
+                    <LogNormal id="LogNormalDistributionModel.5" meanInRealSpace="true" name="distr">
+                        <parameter id="RealParameter.10" spec="parameter.RealParameter" estimate="false" name="M">52.0</parameter>
+                        <parameter id="RealParameter.11" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="5.0">0.5</parameter>
+                    </LogNormal>
+                </distribution>
+
+                <!-- distribution id="migrationRateEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@migrationRateEpi.t:modified_MTBD_2223_7">
+                    <OneOnX id="OneOnX.36" name="distr"/>
+                </distribution> -->
+
+                <distribution id="migrationRateEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@migrationRateEpi.t:modified_MTBD_2223_7">
+                    <LogNormal id="LogNormalDistributionModel.6" meanInRealSpace="true" name="distr">
+                        <parameter id="RealParameter.12" spec="parameter.RealParameter" estimate="false" name="M">2.0</parameter>
+                        <parameter id="RealParameter.13" spec="parameter.RealParameter" estimate="false" lower="0.0" name="S" upper="5.0">0.5</parameter>
+                    </LogNormal>
+                </distribution>
+
+                <prior id="originBDMMPrimePrior.t:modified_MTBD_2223_7" name="distribution" x="@originBDMMPrime.t:modified_MTBD_2223_7">
+                    <OneOnX id="OneOnX.1" name="distr"/>
+                </prior>
+
+                <!--distribution id="samplingProportionEpiPrior.t:modified_MTBD_2223_7" spec="bdmmprime.util.priors.ZeroExcludingPrior" x="@samplingProportionEpi.t:modified_MTBD_2223_7">
+                    <OneOnX id="OneOnX.38" name="distr"/>
+                </distribution> -->
+
+                <distribution id="sp_Japan" spec="bdmmprime.util.priors.SmartZeroExcludingPrior" x="@samplingProportionEpi.t:modified_MTBD_2223_7" classesToExclude="0.1 0.01 0.3">
+                     <distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="0.650"/> <!--147/226--> 
+                </distribution>
+        
+                <distribution id="sp_North_America" spec="bdmmprime.util.priors.SmartZeroExcludingPrior" x="@samplingProportionEpi.t:modified_MTBD_2223_7" classesToExclude="0.2 0.01 0.3">
+                 <distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="0.116"/> <!--90/774-->
+                </distribution>
+
+                <distribution id="sp_North_Asia" spec="bdmmprime.util.priors.SmartZeroExcludingPrior" x="@samplingProportionEpi.t:modified_MTBD_2223_7" classesToExclude="0.2 0.1 0.3">
+                 <distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="0.084"/> <!--9/107-->
+                </distribution>
+
+                <distribution id="sp_Northeast_Asia" spec="bdmmprime.util.priors.SmartZeroExcludingPrior" x="@samplingProportionEpi.t:modified_MTBD_2223_7" classesToExclude="0.2 0.1 0.01">
+                     <distr spec="beast.base.inference.distribution.Uniform" lower="0" upper="1"/> <!--146/124--> 
+                </distribution>
+                 
+                
+            </distribution>
+            
+            <!-- Likelihood -->
+            <distribution id="likelihood" spec="CompoundDistribution" useThreads="true">
+                <distribution id="treeLikelihood.modified_MTBD_2223_7" spec="ThreadedTreeLikelihood" data="@modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7">
+                    <siteModel id="SiteModel.s:modified_MTBD_2223_7" spec="SiteModel" gammaCategoryCount="4" shape="@gammaShape.s:modified_MTBD_2223_7">
+                        <parameter id="mutationRate.s:modified_MTBD_2223_7" spec="parameter.RealParameter" estimate="false" lower="0.0" name="mutationRate">1.0</parameter>
+                        <parameter id="proportionInvariant.s:modified_MTBD_2223_7" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                        <substModel id="hky.s:modified_MTBD_2223_7" spec="HKY" kappa="@kappa.s:modified_MTBD_2223_7">
+                            <frequencies id="estimatedFreqs.s:modified_MTBD_2223_7" spec="Frequencies" frequencies="@freqParameter.s:modified_MTBD_2223_7"/>
+                        </substModel>
+                    </siteModel>
+                    <branchRateModel id="OptimisedRelaxedClock.c:modified_MTBD_2223_7" spec="beast.base.evolution.branchratemodel.UCRelaxedClockModel" clock.rate="@ORCucldMean.c:modified_MTBD_2223_7" rates="@ORCRates.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7">
+                        <LogNormal id="ORCLogNormalDistributionModel.c:modified_MTBD_2223_7" S="@ORCsigma.c:modified_MTBD_2223_7" meanInRealSpace="true" name="distr">
+                            <parameter id="RealParameter.14" spec="parameter.RealParameter" estimate="false" name="M">1.0</parameter>
+                        </LogNormal>
+                    </branchRateModel>
+                </distribution>
+            </distribution>
+        </distribution>
+        
+        <!-- Operators -->
+        <operator id="KappaScaler.s:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="0.05">
+            <parameter idref="kappa.s:modified_MTBD_2223_7"/>
+            <operator id="AVMNOperator.modified_MTBD_2223_7" spec="kernel.AdaptableVarianceMultivariateNormalOperator" allowNonsense="true" beta="0.05" burnin="400" initial="800" weight="0.1">
+                <transformations id="AVMNSumTransform.modified_MTBD_2223_7" spec="operator.kernel.Transform$LogConstrainedSumTransform">
+                    <f idref="freqParameter.s:modified_MTBD_2223_7"/>
+                </transformations>
+                <transformations id="AVMNLogTransform.modified_MTBD_2223_7" spec="operator.kernel.Transform$LogTransform">
+                    <f idref="kappa.s:modified_MTBD_2223_7"/>
+                    <f idref="gammaShape.s:modified_MTBD_2223_7"/>
+                </transformations>
+                <transformations id="AVMNNoTransform.modified_MTBD_2223_7" spec="operator.kernel.Transform$NoTransform">
+                    <f idref="Tree.t:modified_MTBD_2223_7"/>
+                </transformations>
+            </operator>
+            <operator id="KappaScalerX.s:modified_MTBD_2223_7" spec="kernel.BactrianScaleOperator" parameter="@kappa.s:modified_MTBD_2223_7" scaleFactor="0.1" upper="10.0" weight="0.1"/>
+        </operator>
+        <operator id="FrequenciesExchanger.s:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="0.05">
+            <parameter idref="freqParameter.s:modified_MTBD_2223_7"/>
+            <operator idref="AVMNOperator.modified_MTBD_2223_7"/>
+            <operator id="FrequenciesExchangerX.s:modified_MTBD_2223_7" spec="operator.kernel.BactrianDeltaExchangeOperator" delta="0.01" weight="0.1">
+                <parameter idref="freqParameter.s:modified_MTBD_2223_7"/>
+            </operator>
+        </operator>
+        <operator id="gammaShapeScaler.s:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="0.05">
+            <parameter idref="gammaShape.s:modified_MTBD_2223_7"/>
+            <operator idref="AVMNOperator.modified_MTBD_2223_7"/>
+            <operator id="gammaShapeScalerX.s:modified_MTBD_2223_7" spec="kernel.BactrianScaleOperator" parameter="@gammaShape.s:modified_MTBD_2223_7" scaleFactor="0.5" upper="10.0" weight="0.1"/>
+        </operator>
+        <operator id="BDMMPrimeLeafToSA.t:modified_MTBD_2223_7" spec="sa.evolution.operators.LeafToSampledAncestorJump" tree="@Tree.t:modified_MTBD_2223_7" weight="10.0"/>
+        <operator id="BDMMPrimeSAWilsonBalding.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAWilsonBalding" tree="@Tree.t:modified_MTBD_2223_7" weight="10.0"/>
+        <operator id="BDMMPrimeSAWide.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAExchange" isNarrow="false" tree="@Tree.t:modified_MTBD_2223_7" weight="10.0"/>
+        <operator id="BDMMPrimeSANarrow.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAExchange" tree="@Tree.t:modified_MTBD_2223_7" weight="10.0"/>
+        <operator id="BDMMPrimeSAUniformOperator.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAUniform" tree="@Tree.t:modified_MTBD_2223_7" weight="20.0"/>
+        <operator id="BDMMPrimeSATreeRootScaler.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAScaleOperator" rootOnly="true" scaleFactor="0.95" tree="@Tree.t:modified_MTBD_2223_7" weight="1.0"/>
+        <operator id="BDMMPrimeSATreeScaler.t:modified_MTBD_2223_7" spec="sa.evolution.operators.SAScaleOperator" scaleFactor="0.95" tree="@Tree.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="originBDMMPrimeScaler.t:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@originBDMMPrime.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="samplingProportionEpiScaler.t:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@samplingProportionEpi.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="ReEpiScaler.t:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@ReEpi.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="migrationRateEpiScaler.t:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@migrationRateEpi.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="becomeUninfectiousRateEpiScaler.t:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@becomeUninfectiousRateEpi.t:modified_MTBD_2223_7" weight="3.0"/>
+        <operator id="ORCucldMeanScaler.c:modified_MTBD_2223_7" spec="ScaleOperator" parameter="@ORCucldMean.c:modified_MTBD_2223_7" scaleFactor="0.5" weight="3.0"/>
+        <operator id="ORC.UpDown.c:modified_MTBD_2223_7" spec="operator.kernel.BactrianUpDownOperator" scaleFactor="0.75" weight="3.0">
+            <up idref="ORCucldMean.c:modified_MTBD_2223_7"/>
+            <down idref="Tree.t:modified_MTBD_2223_7"/>
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_sigma.c:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="3.0">
+            <parameter idref="ORCsigma.c:modified_MTBD_2223_7"/>
+            <operator id="ORCucldStdevScaler.c:modified_MTBD_2223_7" spec="orc.consoperators.UcldScalerOperator" distr="@ORCLogNormalDistributionModel.c:modified_MTBD_2223_7" rates="@ORCRates.c:modified_MTBD_2223_7" scaleFactor="0.5" stdev="@ORCsigma.c:modified_MTBD_2223_7" weight="1.0">
+                <kernel id="KernelDistribution$Bactrian.17" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCUcldStdevRandomWalk.c:modified_MTBD_2223_7" spec="operator.kernel.BactrianRandomWalkOperator" parameter="@ORCsigma.c:modified_MTBD_2223_7" scaleFactor="0.1" weight="1.0">
+                <kernelDistribution id="KernelDistribution$Bactrian.18" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCUcldStdevScale.c:modified_MTBD_2223_7" spec="kernel.BactrianScaleOperator" parameter="@ORCsigma.c:modified_MTBD_2223_7" scaleFactor="0.5" upper="10.0" weight="1.0">
+                <kernelDistribution id="KernelDistribution$Bactrian.19" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCSampleFromPriorOperator_sigma.c:modified_MTBD_2223_7" spec="orc.operators.SampleFromPriorOperator" parameter="@ORCsigma.c:modified_MTBD_2223_7" prior2="@ORCsigmaPrior.c:modified_MTBD_2223_7" weight="1.0"/>
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_rates_root.c:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="1.0">
+            <parameter idref="ORCRates.c:modified_MTBD_2223_7"/>
+            <tree idref="Tree.t:modified_MTBD_2223_7"/>
+            <operator id="ORCRootOperator1.c:modified_MTBD_2223_7" spec="orc.consoperators.SimpleDistance" clockModel="@OptimisedRelaxedClock.c:modified_MTBD_2223_7" rates="@ORCRates.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7" twindowSize="0.005" weight="1.0">
+                <kernel id="KernelDistribution$Bactrian.20" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCRootOperator2.c:modified_MTBD_2223_7" spec="orc.consoperators.SmallPulley" clockModel="@OptimisedRelaxedClock.c:modified_MTBD_2223_7" dwindowSize="0.005" rates="@ORCRates.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7" weight="1.0">
+                <kernel id="KernelDistribution$Bactrian.21" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_rates_internal.c:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="20.0">
+            <parameter idref="ORCRates.c:modified_MTBD_2223_7"/>
+            <tree idref="Tree.t:modified_MTBD_2223_7"/>
+            <operator id="ORCInternalnodesOperator.c:modified_MTBD_2223_7" spec="orc.consoperators.InConstantDistanceOperator" clockModel="@OptimisedRelaxedClock.c:modified_MTBD_2223_7" rates="@ORCRates.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7" twindowSize="0.005" weight="1.0">
+                <kernel id="KernelDistribution$Bactrian.22" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCRatesRandomWalk.c:modified_MTBD_2223_7" spec="operator.kernel.BactrianRandomWalkOperator" parameter="@ORCRates.c:modified_MTBD_2223_7" scaleFactor="0.1" weight="1.0">
+                <kernelDistribution id="KernelDistribution$Bactrian.23" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCRatesScale.c:modified_MTBD_2223_7" spec="kernel.BactrianScaleOperator" parameter="@ORCRates.c:modified_MTBD_2223_7" scaleFactor="0.5" upper="10.0" weight="1.0">
+                <kernelDistribution id="KernelDistribution$Bactrian.24" spec="operator.kernel.KernelDistribution$Bactrian"/>
+            </operator>
+            <operator id="ORCSampleFromPriorOperator.rates.c:modified_MTBD_2223_7" spec="orc.operators.SampleFromPriorOperator" parameter="@ORCRates.c:modified_MTBD_2223_7" prior2="@ORCRatePriorDistribution.c:modified_MTBD_2223_7" weight="1.0"/>
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_NER.c:modified_MTBD_2223_7" spec="AdaptableOperatorSampler" weight="10.0">
+            <tree idref="Tree.t:modified_MTBD_2223_7"/>
+            <operator id="ORCNER_null.c:modified_MTBD_2223_7" spec="Exchange" tree="@Tree.t:modified_MTBD_2223_7" weight="1.0"/>
+            <operator id="ORCNER_dAE_dBE_dCE.c:modified_MTBD_2223_7" spec="orc.ner.NEROperator_dAE_dBE_dCE" rates="@ORCRates.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7" weight="1.0"/>
+            <metric id="RNNIMetric.0" spec="beastlabs.evolution.tree.RNNIMetric" taxonset="@TaxonSet.modified_MTBD_2223_7"/>
+        </operator>
+        
+        <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="10000" model="@posterior" sanitiseHeaders="true" sort="smart">
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+            <log idref="treeLikelihood.modified_MTBD_2223_7"/>
+            <log id="TreeHeight.t:modified_MTBD_2223_7" spec="beast.base.evolution.tree.TreeStatLogger" tree="@Tree.t:modified_MTBD_2223_7"/>
+            <log idref="kappa.s:modified_MTBD_2223_7"/>
+            <log idref="freqParameter.s:modified_MTBD_2223_7"/>
+            <log idref="gammaShape.s:modified_MTBD_2223_7"/>
+            <log idref="originBDMMPrime.t:modified_MTBD_2223_7"/>
+            <log id="startTypePosteriorProbsLogger.t:modified_MTBD_2223_7" spec="bdmmprime.util.StartTypePosteriorProbsLogger" bdmmTreePrior="@BDMMPrime.t:modified_MTBD_2223_7"/>
+            <log id="typedTreeStats.t:modified_MTBD_2223_7" spec="bdmmprime.mapping.TypedTreeStatsLogger" includeRootEdge="true" typeLabel="type" typeSet="@typeSetBDMMPrime.t:modified_MTBD_2223_7">
+                <typedTree id="typeMappedTree.t:modified_MTBD_2223_7" spec="bdmmprime.mapping.TypeMappedTree" bdmmDistrib="@BDMMPrime.t:modified_MTBD_2223_7" mapOnInit="false" remapOnLog="true" startTypePriorProbs="@startTypePriorProbs.t:modified_MTBD_2223_7" typeLabel="type" typeTraitSet="@typeTraitSet.t:modified_MTBD_2223_7" untypedTree="@Tree.t:modified_MTBD_2223_7"/>
+            </log>
+            <log idref="samplingProportionSPEpi.t:modified_MTBD_2223_7"/>
+            <log idref="ReSPEpi.t:modified_MTBD_2223_7"/>
+            <log idref="migrationRateSPEpi.t:modified_MTBD_2223_7"/>
+            <log idref="becomeUninfectiousRateSPEpi.t:modified_MTBD_2223_7"/>
+            <log idref="ORCucldMean.c:modified_MTBD_2223_7"/>
+            <log idref="ORCsigma.c:modified_MTBD_2223_7"/>
+            <log id="ORCRatesStat.c:modified_MTBD_2223_7" spec="beast.base.evolution.RateStatistic" branchratemodel="@OptimisedRelaxedClock.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7"/>
+        </logger>
+        
+        <logger id="screenlog" spec="Logger" logEvery="10000">
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+        
+        <logger id="treelog.t:modified_MTBD_2223_7" spec="Logger" fileName="$(filebase)-$(tree).trees" logEvery="100000" mode="tree">
+            <log id="TreeWithMetaDataLogger.t:modified_MTBD_2223_7" spec="beast.base.evolution.TreeWithMetaDataLogger" branchratemodel="@OptimisedRelaxedClock.c:modified_MTBD_2223_7" tree="@Tree.t:modified_MTBD_2223_7"/>
+        </logger>
+        
+        <logger id="typedTreeLogger.t:modified_MTBD_2223_7" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase).$(tree).typed.trees" logEvery="100000" mode="tree">
+            <log idref="typeMappedTree.t:modified_MTBD_2223_7"/>
+        </logger>
+        
+        <logger id="nodeTypedTreeLogger.t:modified_MTBD_2223_7" spec="bdmmprime.util.OptionalLogger" enableLogger="true" fileName="$(filebase).$(tree).typed.node.trees" logEvery="100000" mode="tree">
+            <log id="nodeTypedTree.t:modified_MTBD_2223_7" spec="bdmmprime.mapping.TypedNodeTreeLogger" typedTree="@typeMappedTree.t:modified_MTBD_2223_7"/>
+        </logger>
+        
+        <logger id="trajLogger.t:modified_MTBD_2223_7" spec="bdmmprime.util.OptionalLogger" fileName="$(filebase).$(tree).traj" logEvery="1000">
+            <log id="typedTraj.t:modified_MTBD_2223_7" spec="bdmmprime.trajectories.SampledTrajectory" bdmmDistrib="@BDMMPrime.t:modified_MTBD_2223_7" startTypePriorProbs="@startTypePriorProbs.t:modified_MTBD_2223_7" typeMappedTree="@typeMappedTree.t:modified_MTBD_2223_7" useTauLeaping="true"/>
+        </logger>
+        
+        <operatorschedule id="OperatorSchedule" spec="OperatorSchedule"/>
+    </run>
+
+</beast>
